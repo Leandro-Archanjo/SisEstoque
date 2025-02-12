@@ -119,14 +119,11 @@ namespace SisEstoque.Entities
             {
                 using (StreamReader sr = File.OpenText(CaminhoArquivo))
                 {
-                    string[] linha;
+                    string[] linha = null;
                     while (!sr.EndOfStream)
                     {
                         linha = sr.ReadLine().Split(',');
-                        foreach (var prod in linha)
-                        {
-                            Console.WriteLine(prod);
-                        }
+                        Console.WriteLine(linha[0] + linha[1] + linha[2] + linha[3] + linha[4]);
                     }
                 }
             }

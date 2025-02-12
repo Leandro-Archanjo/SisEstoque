@@ -12,7 +12,7 @@ namespace SisEstoque
         {
             Console.WriteLine("<-- SisEstoque seu programa de estoque -->\n");
             Console.WriteLine("Operações: ");
-            Console.WriteLine("1 - Cadastrar produto 2 - Alterar preço do produto 3 - Listar estoque");
+            Console.WriteLine("1 - Cadastrar produto \n2 - Alterar preço do produto \n3 - Listar estoque");
             int operacao = int.Parse(Console.ReadLine());
             Console.Clear();
 
