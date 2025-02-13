@@ -51,6 +51,34 @@ namespace SisEstoque.Entities
             Produtos.Add(prod);
         }
 
+        public void PopularListaProduto()
+        {
+            Produtos.Clear();
+
+            try
+            {
+                using (StreamReader sr = File.OpenText(CaminhoArquivo))
+                {
+                    string[] linha;
+                    while (!sr.EndOfStream)
+                    {
+                        linha = sr.ReadLine().Split(',');
+                        int id = int.Parse(linha[0]);
+                        string nome = linha[1];
+                        double preco = double.Parse(linha[2], CultureInfo.InvariantCulture);
+                        int quantidade = int.Parse(linha[3]);
+                        Categoria categoria = Enum.Parse<Categoria>(linha[4]);
+
+                        Produtos.Add(new Produto(id, nome, preco, quantidade, categoria));
+                    }
+                }
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine("Ocorreu um erro: " + ex.Message);
+            }
+        }
+
         public void SalvarNoEstoque()
         {
             try
@@ -74,31 +102,16 @@ namespace SisEstoque.Entities
 
         public void AlterarPreco(int idProd, double precoNovo)
         {
-            Produtos.Clear();
+            PopularListaProduto();
 
-            StreamReader sr = null;
             FileStream fs = null;
             StreamWriter sw = null;
 
-            string[] linha;
-            int id = 0;
-            string nome;
-            double preco;
-            int quantidade = 0;
-            Categoria categoria = new Categoria();
-
-            using (sr = File.OpenText(CaminhoArquivo))
+            foreach (Produto prod in Produtos)
             {
-                while (!sr.EndOfStream)
+                if (prod.Id == idProd)
                 {
-                    linha = sr.ReadLine().Split(',');
-                    id = int.Parse(linha[0]);
-                    nome = linha[1];
-                    preco = double.Parse(linha[2], CultureInfo.InvariantCulture);
-                    quantidade = int.Parse(linha[3]);
-                    categoria = Enum.Parse<Categoria>(linha[4]);
-
-                    Produtos.Add(new Produto(id, nome, preco, quantidade, categoria));
+                    prod.Preco = precoNovo;
                 }
             }
             File.Delete(CaminhoArquivo);
@@ -108,7 +121,7 @@ namespace SisEstoque.Entities
                 {
                     foreach (Produto p in Produtos)
                     {
-                        sw.WriteLine(p);
+                        sw.WriteLine(p.ToString());
                     }
                 }
             }
@@ -123,13 +136,96 @@ namespace SisEstoque.Entities
                     while (!sr.EndOfStream)
                     {
                         linha = sr.ReadLine().Split(',');
-                        Console.WriteLine(linha[0] + linha[1] + linha[2] + linha[3] + linha[4]);
+                        Console.WriteLine(linha[0] + " " + linha[1] + " " + linha[2] + " " + linha[3] + " " + linha[4]);
                     }
                 }
             }
             catch (IOException ex)
             {
                 Console.WriteLine(ex.Message);
+            }
+        }
+
+        public void FiltrarEstoque(int operacao)
+        {
+            PopularListaProduto();
+
+            switch (operacao)
+            {
+                case 1:
+                    Console.Write("Informe o Id: ");
+                    int id = int.Parse(Console.ReadLine());
+
+                    var filtrarId = (from p in Produtos
+                                     where p.Id == id
+                                     select p);
+
+                    foreach (Produto p in filtrarId)
+                    {
+                        Console.WriteLine(p);
+                    }
+
+                    break;
+                case 2:
+                    Console.Write("Informe uma categoria: ");
+                    string formatacao = Console.ReadLine();
+                    Categoria categoria = Enum.Parse<Categoria>(formatacao.Substring(0, 1).ToUpper() + formatacao.Substring(1));
+
+                    var filtroCategoria = (from p in Produtos
+                                           where p.Categoria == categoria
+                                           select p);
+
+                    foreach (Produto p in filtroCategoria)
+                    {
+                        Console.WriteLine(p);
+                    }
+
+                    break;
+                case 3:
+                    Console.Write("Infore um nome: ");
+                    string nome = Console.ReadLine();
+
+                    var filtroNome = (from p in Produtos
+                                       where p.Nome == nome
+                                       select p);
+
+                    foreach (Produto p in filtroNome)
+                    {
+                        Console.WriteLine(p);
+                    }
+
+                    break;
+                case 4:
+                    Console.Write("Valor maior que: ");
+                    double precoMaior = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+
+                    var maiorPreco = (from p in Produtos
+                                       where p.Preco > precoMaior
+                                       select p);
+
+                    foreach (Produto p in maiorPreco)
+                    {
+                        Console.WriteLine(p);
+                    }
+
+                    break;
+                case 5:
+                    Console.Write("Valor menor que: ");
+                    double precoMenor = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+
+                    var menorPreco = (from p in Produtos
+                                             where p.Preco < precoMenor
+                                             select p);
+
+                    foreach (Produto p in menorPreco)
+                    {
+                        Console.WriteLine(p);
+                    }
+
+                    break;
+                default:
+                    Console.WriteLine("Operação inválida");
+                    break;
             }
         }
     }

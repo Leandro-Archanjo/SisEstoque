@@ -25,7 +25,7 @@ namespace SisEstoque.Entities
         public override string ToString()
         {
             return
-                Id + ", " + Nome + ", " + Preco.ToString("F2", CultureInfo.InvariantCulture) + ", " + Quantidade + ", " + Categoria;
+                Id + "," +Nome + "," + Preco.ToString("F2", CultureInfo.InvariantCulture) + "," + Quantidade + "," + Categoria;
         }
     }
 }
